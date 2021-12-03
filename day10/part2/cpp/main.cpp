@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <memory>
 #include <set>
+#include <vector>
 
 int main() {
     std::ifstream input_data("./input_data.txt");
@@ -11,24 +12,33 @@ int main() {
 
     std::string line;
     std::set<unsigned int> data;
+    std::vector<unsigned int> ordered_data;
 
     while(std::getline(input_data, line)) {
-        data.insert(std::strtol(line.c_str(), nullptr, 10));
+        int number = std::strtol(line.c_str(), nullptr, 10);
+        data.insert(number);
+        ordered_data.push_back(number);
     }
 
+    std::sort(ordered_data.begin(), ordered_data.end());
+    auto last_number = ordered_data.back();
+
+    std::vector<unsigned int> must_have;
     unsigned int variations = 0;
-    unsigned int prev_number = 0;
-    for (auto current : data) {
-        for (int i: {1, 2, 3}) {
-            auto res = prev_number + i;
-            if ((data.count(res) > 0) ) {
-                variations++;
+    unsigned int prev_number = last_number+3;
+    while(prev_number != 0) {
+        for(auto diff : {3,2,1}) {
+            auto must_have_number = prev_number - diff;
+            if( data.contains(must_have_number) ) {
+                must_have.push_back(must_have_number);
+                prev_number = must_have_number;
+                break;
             }
         }
-        prev_number = current;
+
     }
 
 
-    std::cout << "Solution is: " << variations << std::endl;
+    std::cout << "Solution is: " <<  ordered_data.size() - must_have.size() << std::endl;
     return 0;
 }
